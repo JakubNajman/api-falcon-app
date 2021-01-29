@@ -1,0 +1,1 @@
+uwsgi --http-socket :9090 --wsgi-file ./src/main.py

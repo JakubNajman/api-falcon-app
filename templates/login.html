@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>Kosmodron</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div>
+      <h1>Zaloguje sie!</h1>
+      <br>
+      <form action="/" method="post" role="form">
+        <input type="text" placeholder="Username" name="username" value="{{
+          username }}">
+         <input type="password" placeholder="Password" name="password" value="{{
+          password }}">
+        <input class="btn btn-default" type="submit" value="Login">
+      </form>
+      {% if error %}
+        <p><strong>Error:</strong> {{ error }}
+      {% endif %}
+    </div>
+  </body>
+</html>

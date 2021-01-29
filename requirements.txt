@@ -1,0 +1,4 @@
+mysql-connector-python==8.0.23
+falcon
+jinja2
+uWSGI==2.0.19.1

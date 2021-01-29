@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Nowy Lot w Kosmos</title>
+  </head>
+  <body>
+    <div align="center">
+      <h1>Edytuj Lot W Kosmos nr {{record['id']}}</h1>
+      <br />
+      <form action="/update/{{record['id']}}" method="post" role="form">
+        <table border="1" cellpadding="10">
+          <tr>
+            <td>Nazwa firmy:</td>
+            <td><input type="text" name="company_name" value={{record["company_name"]}} /></td>
+          </tr>
+          <tr>
+            <td>Lokalizacja:</td>
+            <td><input type="text" name="location" value="{{record["location"]}}" /></td>
+          </tr>
+          <tr>
+            <td>Data:</td>
+            <td><input type="text" name="date" value={{record["date"]}} /></td>
+          </tr>
+          <tr>
+            <td>Szczegoly:</td>
+            <td><input type="text" name="detail" value={{record["detail"]}} /></td>
+          </tr>
+          <tr>
+            <td>Status rakiety:</td>
+            <td><input type="text" name="rocket_status" value={{record["rocket_status"]}} /></td>
+          </tr>
+          <tr>
+            <td>Rakieta:</td>
+            <td><input type="text" name="rocket" value={{record["rocket"]}} /></td>
+          </tr>
+          <tr>
+            <td>Status misji:</td>
+            <td><input type="text" name="mission_status" value={{record["mission_status"]}} /></td>
+          </tr>
+          <tr>
+            <input type="submit" value="Update">
+          </tr>
+        </table>
+      </form>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: falcon
+  labels:
+    purpose: falcon
+spec:
+  selector:
+    matchLabels:
+      app: falcon
+  template:
+    metadata:
+      labels:
+        app: falcon
+    spec:
+      containers:
+      - name: falcon
+        imagePullPolicy: Always
+        image: eu.gcr.io/yndblog/falcon_app:$BITBUCKET_COMMIT_SHORT
+        ports:
+          - containerPort: 9090

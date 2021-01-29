@@ -1,0 +1,64 @@
+image: 
+    name: eu.gcr.io/yndblog/alpine_for_falcon:latest
+    username: _json_key
+    password: '$GCR_JSON_KEY_NOT_CODED'
+
+pipelines:
+  default:
+    # - parallel: Przez parallel robia sie jednoczesnie
+    - step:
+        deployment: Test
+        name: Building and pushing Image to GCK Container Registry
+        script:
+          - export TIME_START=$(date +%s)
+          - echo $TIME_START > ./timestart.txt
+          - export BITBUCKET_COMMIT_SHORT=$(echo $BITBUCKET_COMMIT | cut -c1-7)
+          # - echo "Bitbucket hash - wersja obrazu:"
+          - echo $GCR_JSON_KEY_NOT_CODED > ./gcloud-api-key.json
+          - echo $CLIENT_CERT > ./client-cert.pem
+          - echo $CLIENT_KEY > ./client-key.pem
+          - echo $SERVER_CA > ./server-ca.pem
+          - gcloud auth activate-service-account --key-file gcloud-api-key.json
+          - gcloud config set project yndblog
+          # - docker build -t eu.gcr.io/yndblog/falcon_app:$BITBUCKET_COMMIT_SHORT .
+          - cat ./gcloud-api-key.json | docker login -u _json_key --password-stdin https://eu.gcr.io
+          # - docker push eu.gcr.io/yndblog/falcon_app:$BITBUCKET_COMMIT_SHORT
+          - docker build -t eu.gcr.io/yndblog/falcon_app:$BITBUCKET_COMMIT_SHORT .
+          - docker push eu.gcr.io/yndblog/falcon_app:$BITBUCKET_COMMIT_SHORT
+        services:
+          - docker
+        artifacts:
+          - timestart.txt
+    - step: 
+        name: Applying app on Kubernetes Engine on GCP
+        script:
+          - export BITBUCKET_COMMIT_SHORT=$(echo $BITBUCKET_COMMIT | cut -c1-7)
+          - envsubst < falconDeployment.yaml > falconDeploymentT.yaml
+          - echo $GCR_JSON_KEY_NOT_CODED > ./gcloud-api-key.json
+          - gcloud auth activate-service-account --key-file gcloud-api-key.json
+          - gcloud config set project yndblog
+          - gcloud container clusters get-credentials $CLUSTER --region europe-north1 --project $PROJECT
+          - gcloud components install kubectl
+          - kubectl apply -f falconDeploymentT.yaml
+          - export TIME_STOP=$(date +%s)
+          - echo $TIME_STOP > ./timestop.txt
+        artifacts:
+          - timestart.txt
+        after-script:
+          - export BITBUCKET_COMMIT_SHORT=$(echo $BITBUCKET_COMMIT | cut -c1-7)
+          - TIME_START=`cat timestart.txt`
+          - TIME_STOP=`cat timestop.txt`
+          - export DURATION=$(($TIME_STOP - $TIME_START))
+          - if [[ BITBUCKET_EXIT_CODE -eq 0 ]];then TEXT="Build sie udal"; else TEXT="Build obrazu sie nie udal"; fi;
+          - pipe: atlassian/email-notify:0.4.2
+            variables:
+              USERNAME: 'jakub.volodymyr@gmail.com'
+              PASSWORD: 'xuejzhfjlkkvkokm'
+              FROM: 'jakub.volodymyr@gmail.com'
+              TO: 'devops_academy@ynd.co'
+              HOST: 'smtp.gmail.com'
+              SUBJECT: 'Build Jakub Najman'
+              BODY_PLAIN: '${TEXT}. Build trwal: ${DURATION} sekund. Link: http://jakub-najman.ynd-development.com:9090'
+            
+
+            

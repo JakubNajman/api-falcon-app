@@ -1,0 +1,8 @@
+version: '3'
+services: 
+  falconapp:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    image: 'eu.gcr.io/yndblog/falcon_app:$BITBUCKET_COMMIT_SHORT'
